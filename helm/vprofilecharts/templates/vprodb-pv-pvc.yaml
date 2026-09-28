@@ -11,16 +11,3 @@ spec:
   storageClassName: mysql-storage-class
   hostPath:
     path: /mnt/data/vprodb
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: vprodb-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: mysql-storage-class
-  resources:
-    requests:
-      storage: 5Gi
-      #

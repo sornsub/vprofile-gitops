@@ -4,48 +4,67 @@ metadata:
   name: vprodb
   labels:
     app: vprodb
+
 spec:
   selector:
     matchLabels:
       app: vprodb
-  serviceName: "vprodb" # Required for StatefulSet
+
+  serviceName: "vprodb"
   replicas: 1
+
   template:
     metadata:
       labels:
         app: vprodb
+
     spec:
       containers:
-      - name: vprodb
-        image: vprofile/vprofiledb
-        ports:
-        - name: vprodb-port
-          containerPort: 3306
-        env: 
-         - name: MYSQL_ROOT_PASSWORD
-           valueFrom:
-             secretKeyRef:
-               name: app-secret
-               key: db-pass
-        volumeMounts:
-        - name: vprodb-persistent-storage
-          mountPath: /var/lib/mysql
-        readinessProbe:
-          tcpSocket:
-            port: 3306
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        livenessProbe:
-          tcpSocket:
-            port: 3306
-          initialDelaySeconds: 15
-          periodSeconds: 20
+        - name: vprodb
+          image: vprofile/vprofiledb
+
+          ports:
+            - name: vprodb-port
+              containerPort: 3306
+
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: db-pass
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          volumeMounts:
+            - name: vprodb-persistent-storage
+              mountPath: /var/lib/mysql
+
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
   volumeClaimTemplates:
-  - metadata:
-      name: vprodb-persistent-storage
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "mysql-storage-class"
-      resources:
-        requests:
-          storage: 5Gi
+    - metadata:
+        name: vprodb-persistent-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: "mysql-storage-class"
+        resources:
+          requests:
+            storage: 5Gi

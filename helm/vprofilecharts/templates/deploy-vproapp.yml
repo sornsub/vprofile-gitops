@@ -6,7 +6,6 @@ metadata:
     app: vproapp
 
 spec:
-  replicas: 1
 
   selector:
     matchLabels:
